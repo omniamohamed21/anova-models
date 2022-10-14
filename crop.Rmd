@@ -1,0 +1,61 @@
+---
+title: "crop data"
+output:
+  html_document: default
+  pdf_document: default
+date: '2022-10-14'
+---
+
+```{r}
+library(dplyr)
+library(finalfit)
+library(gtsummary)
+library(ggplot2)
+crop<-read.csv("crop.data.csv")
+crop$fertilizer<-as.character(crop$fertilizer)
+crop$fertilizer<-as.factor(crop$fertilizer)
+summary(crop)
+head(crop, 10)
+
+shapiro.test(crop$yield)
+
+cropdes<-crop %>% group_by(fertilizer)%>%
+  summarise(count = n(),
+            mean = mean(yield),
+            sd = sd(yield))
+
+cropdes 
+
+cropex<-crop %>% group_by(fertilizer) %>% summarise(max = max(yield, na.rm=TRUE))
+cropex   
+            
+ggplot(crop,aes(x = fertilizer,y = yield)) + geom_bar(aes(fill = fertilizer),stat = "identity",position = "dodge") + theme_classic() +labs(y="Values",  x="fertilizers", title="Comparision of f1, f2, f3") + theme(text = element_text(size=15),  axis.text.x = element_text(angle=90, hjust=1))
+
+
+crop.aov1<-aov(yield~fertilizer+density+block, data= crop)
+summary(crop.aov1)
+crop.aov2<-aov(yield~fertilizer+density+fertilizer*density, data= crop)
+summary(crop.aov2)
+
+crop.aov2<-aov(yield~factor(fertilizer)+ factor(density), data= crop)
+TukeyHSD(crop.aov2, conf.level=.95)
+tbl_regression(crop.aov2,exponentiate = TRUE)
+
+ 
+ggplot(crop, aes(fertilizer, yield)) + geom_boxplot(aes(fill = fertilizer))+
+  theme(panel.grid.major = element_blank())
+
+```
+
+ 
+
+```{r }
+ 
+```
+
+ 
+```{r}
+ 
+```
+
+ 
